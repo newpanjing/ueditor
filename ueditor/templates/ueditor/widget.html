@@ -1,4 +1,8 @@
+
 {% load static %}
-<div class="django-ckeditor-widget" data-field-id="{{id}}" style="display: inline-block;">
-    <textarea{{ final_attrs }} data-processed="0" data-config="{{ config }}" data-external-plugin-resources="{{ external_plugin_resources }}" data-id="{{id}}" data-type="ckeditortype">{{ value }}</textarea>
+<script type="text/javascript">
+   var UEDITOR_CONFIG={{config|safe}}
+</script>
+<div class="django-ueditor-widget" style="display: inline-block;">
+    <textarea name="{{ name }}" id="ueditor">{{ value }}</textarea>
 </div>

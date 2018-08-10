@@ -1,0 +1,3 @@
+recursive-include ueditor/ *.py
+recursive-include ueditor/static *
+recursive-include ueditor/templates *

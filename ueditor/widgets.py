@@ -32,22 +32,25 @@ class LazyEncoder(DjangoJSONEncoder):
 json_encode = LazyEncoder().encode
 
 DEFAULT_CONFIG = {
-    'skin': 'moono-lisa',
-    'toolbar_Basic': [
-        ['Source', '-', 'Bold', 'Italic']
-    ],
-    'toolbar_Full': [
-        ['Styles', 'Format', 'Bold', 'Italic', 'Underline', 'Strike', 'SpellChecker', 'Undo', 'Redo'],
-        ['Link', 'Unlink', 'Anchor'],
-        ['Image', 'Flash', 'Table', 'HorizontalRule'],
-        ['TextColor', 'BGColor'],
-        ['Smiley', 'SpecialChar'], ['Source'],
-    ],
-    'toolbar': 'Full',
-    'height': 291,
-    'width': 835,
-    'filebrowserWindowWidth': 940,
-    'filebrowserWindowHeight': 725,
+    'UEDITOR_HOME_URL': '/static/ueditor/',
+    'serverUrl': '/ueditor/upload',
+    'toolbars': [[
+        'fullscreen', 'source', '|', 'undo', 'redo', '|',
+        'bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'superscript', 'subscript', 'removeformat',
+        'formatmatch', 'autotypeset', 'blockquote', 'pasteplain', '|', 'forecolor', 'backcolor', 'insertorderedlist',
+        'insertunorderedlist', 'selectall', 'cleardoc', '|',
+        'rowspacingtop', 'rowspacingbottom', 'lineheight', '|',
+        'customstyle', 'paragraph', 'fontfamily', 'fontsize', '|',
+        'directionalityltr', 'directionalityrtl', 'indent', '|',
+        'justifyleft', 'justifycenter', 'justifyright', 'justifyjustify', '|', 'touppercase', 'tolowercase', '|',
+        'link', 'unlink', 'anchor', '|', 'imagenone', 'imageleft', 'imageright', 'imagecenter', '|',
+        'simpleupload', 'insertimage', 'emotion', 'scrawl', 'insertvideo', 'music', 'attachment', 'map', 'gmap',
+        'insertframe', 'insertcode', 'webapp', 'pagebreak', 'template', 'background', '|',
+        'horizontal', 'date', 'time', 'spechars', 'snapscreen', 'wordimage', '|',
+        'inserttable', 'deletetable', 'insertparagraphbeforetable', 'insertrow', 'deleterow', 'insertcol', 'deletecol',
+        'mergecells', 'mergeright', 'mergedown', 'splittocells', 'splittorows', 'splittocols', 'charts', '|',
+        'print', 'preview', 'searchreplace', 'drafts', 'help'
+    ]]
 }
 
 
@@ -58,78 +61,29 @@ class UEditorWidget(forms.Textarea):
     """
 
     class Media:
-        js = (
-            'ueditor/ueditor/ueditor.config.js',
-            'ueditor/ueditor/ueditor.all.min.js',
-            JS('ueditor/ueditor.init.js'),
-        )
+        js = ('ueditor/ueditor.all.js',
+              'ueditor/lang/zh-cn/zh-cn.js',
+              JS('ueditor/ueditor.init.js'),
+              )
 
-    def __init__(self, config_name='default', extra_plugins=None, external_plugin_resources=None, *args, **kwargs):
+    def __init__(self, config={}, *args, **kwargs):
         super(UEditorWidget, self).__init__(*args, **kwargs)
         # Setup config from defaults.
-        self.config = DEFAULT_CONFIG.copy()
+        # 填充默认值
+        for key in DEFAULT_CONFIG:
+            if key not in config:
+                config[key] = DEFAULT_CONFIG[key]
 
-        # Try to get valid config from settings.
-        configs = getattr(settings, 'CKEDITOR_CONFIGS', None)
-        if configs:
-            if isinstance(configs, dict):
-                # Make sure the config_name exists.
-                if config_name in configs:
-                    config = configs[config_name]
-                    # Make sure the configuration is a dictionary.
-                    if not isinstance(config, dict):
-                        raise ImproperlyConfigured('CKEDITOR_CONFIGS["%s"] \
-                                setting must be a dictionary type.' %
-                                                   config_name)
-                    # Override defaults with settings config.
-                    self.config.update(config)
-                else:
-                    raise ImproperlyConfigured("No configuration named '%s' \
-                            found in your CKEDITOR_CONFIGS setting." %
-                                               config_name)
-            else:
-                raise ImproperlyConfigured('CKEDITOR_CONFIGS setting must be a\
-                        dictionary type.')
-
-        extra_plugins = extra_plugins or []
-
-        if extra_plugins:
-            self.config['extraPlugins'] = ','.join(extra_plugins)
-
-        self.external_plugin_resources = external_plugin_resources or []
+        self.config = config
 
     def render(self, name, value, attrs=None, renderer=None):
         if renderer is None:
             renderer = get_default_renderer()
         if value is None:
             value = ''
-        final_attrs = self.build_attrs(self.attrs, attrs, name=name)
-        self._set_config()
-        external_plugin_resources = [[force_text(a), force_text(b), force_text(c)]
-                                     for a, b, c in self.external_plugin_resources]
 
-        return mark_safe(renderer.render('ueditor/widget.html11', {
-            'final_attrs': flatatt(final_attrs),
+        return mark_safe(renderer.render('ueditor/widget.html', {
             'value': conditional_escape(force_text(value)),
-            'id': final_attrs['id'],
             'config': json_encode(self.config),
-            'external_plugin_resources': json_encode(external_plugin_resources)
+            'name': name,
         }))
-
-    def build_attrs(self, base_attrs, extra_attrs=None, **kwargs):
-        """
-        Helper function for building an attribute dictionary.
-        This is combination of the same method from Django<=1.10 and Django1.11+
-        """
-        attrs = dict(base_attrs, **kwargs)
-        if extra_attrs:
-            attrs.update(extra_attrs)
-        return attrs
-
-    def _set_config(self):
-        lang = get_language()
-        if lang == 'zh-hans':
-            lang = 'zh-cn'
-        elif lang == 'zh-hant':
-            lang = 'zh'
-        self.config['language'] = lang
