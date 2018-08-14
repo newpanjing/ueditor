@@ -6,11 +6,11 @@ long_description = "\n".join([
 
 setup(
     name='ueditor',
-    version='1.1',
+    version='1.2',
     packages=find_packages(),
     zip_safe=False,
     include_package_data=True,
-    url='https://www.88cto.com/page/ueditor',
+    url='https://github.com/newpanjing/ueditor.git',
     license='Apache Listen 2.0',
     author='panjing',
     author_email='newpanjing@icloud.com',

@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 import json
 import os
+import base64
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -60,7 +61,10 @@ def upload_file(request):
         os.system("mkdir -p {}".format(dir))
     # 写入数据
     file = request.FILES.get("upfile")
-    file_name = short_id.get_short_id() + ".png"
+    name = file.name
+    suffix = os.path.splitext(name)[1]
+
+    file_name = short_id.get_short_id() + suffix
 
     f = open(os.path.join(dir, file_name), 'wb')
     for chunk in file.chunks():
@@ -93,10 +97,43 @@ def _get_config(name):
             "variable or in setting.py" % name)
 
 
+def upload_scrawl(request):
+    # 涂鸦
+    strs = request.POST.get("upfile")
+
+    imgdata = base64.b64decode(strs)
+
+    dir = _get_config('UEDITOR_UPLOAD_DIR')
+    url = _get_config('UEDITOR_UPLOAD_PREFIX')
+
+    # 判断文件夹是否存
+    if not os.path.exists(dir):
+        os.system("mkdir -p {}".format(dir))
+    file_name = short_id.get_short_id() + ".png"
+
+    file = open(os.path.join(dir, file_name), 'wb')
+    file.write(imgdata)
+    file.close()
+
+    # 响应
+    results = {
+        "name": file_name,
+        "original": file_name,
+        "size": "",
+        "state": "SUCCESS",
+        "type": "png",
+        "url": url + file_name
+    }
+
+    return HttpResponse(json.dumps(results))
+
+
 def handler(request):
     setattr(request, '_dont_enforce_csrf_checks', True)
     action = request.GET.get("action", "")
     if action == "config":
         return get_config()
+    elif action == 'uploadscrawl':
+        return upload_scrawl(request)
     else:
         return upload_file(request)

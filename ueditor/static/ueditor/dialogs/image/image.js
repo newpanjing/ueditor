@@ -58,6 +58,15 @@
                 setAlign(editor.getOpt('imageInsertAlign'));
                 uploadImage = uploadImage || new UploadImage('queueList');
                 break;
+            case 'online':
+                setAlign(editor.getOpt('imageManagerInsertAlign'));
+                onlineImage = onlineImage || new OnlineImage('imageList');
+                onlineImage.reset();
+                break;
+            case 'search':
+                setAlign(editor.getOpt('imageManagerInsertAlign'));
+                searchImage = searchImage || new SearchImage();
+                break;
         }
     }
 
