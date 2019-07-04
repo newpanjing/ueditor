@@ -16,5 +16,5 @@ setup(
     author_email='newpanjing@icloud.com',
     description='django ueditor plugin',
     long_description=long_description,
-    install_requires=['django', 'shortid8'],
+    install_requires=['django', 'shortid8','django-js-asset'],
 )
