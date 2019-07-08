@@ -1,0 +1,22 @@
+Metadata-Version: 1.1
+Name: ueditor
+Version: 1.4
+Summary: django ueditor plugin
+Home-page: https://github.com/newpanjing/ueditor.git
+Author: panjing
+Author-email: newpanjing@icloud.com
+License: Apache Listen 2.0
+Description: **ueditor**
+        
+        a django RichText plugin.
+        
+        github:
+        
+        https://github.com/newpanjing/ueditor
+        
+        
+        
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent

@@ -1,0 +1,3 @@
+django
+shortid8
+django-js-asset

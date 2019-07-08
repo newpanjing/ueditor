@@ -6,7 +6,7 @@ long_description = "\n".join([
 
 setup(
     name='ueditor',
-    version='1.3',
+    version='1.4',
     packages=find_packages(),
     zip_safe=False,
     include_package_data=True,
@@ -14,7 +14,11 @@ setup(
     license='Apache Listen 2.0',
     author='panjing',
     author_email='newpanjing@icloud.com',
-    description='django ueditor plugin',
+    description='a django RichText plugin.',
     long_description=long_description,
-    install_requires=['django', 'shortid8','django-js-asset'],
+    install_requires=['django', 'shortid8', 'django-js-asset'],
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "Operating System :: OS Independent",
+    ]
 )
