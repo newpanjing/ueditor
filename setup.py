@@ -6,7 +6,7 @@ long_description = "\n".join([
 
 setup(
     name='ueditor',
-    version='1.2',
+    version='1.3',
     packages=find_packages(),
     zip_safe=False,
     include_package_data=True,
